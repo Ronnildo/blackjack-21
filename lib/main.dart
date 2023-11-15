@@ -2,7 +2,7 @@ import 'package:blackjack/src/view/home.dart';
 import "package:flutter/material.dart";
 
 void main(List<String> args) {
-  runApp(BlackJack());
+  runApp(const BlackJack());
 }
 
 class BlackJack extends StatelessWidget {
