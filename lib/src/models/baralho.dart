@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:blackjack/src/model/carta.dart';
-import 'package:blackjack/src/model/naipe.dart';
-import 'package:blackjack/src/model/valor.dart';
+import 'package:blackjack/src/models/carta.dart';
+import 'package:blackjack/src/models/naipe.dart';
+import 'package:blackjack/src/models/valor.dart';
 
 class Baralho {
   final int qtdCartas = 52;
@@ -25,7 +25,7 @@ class Baralho {
       for (var i = 0; i < 13; i++) {
         Valor valor = valores[i];
         if (i > 10) {
-          Carta c = Carta(valor, i, naipe);
+          Carta c = Carta(valor, 10, naipe);
           cartaList.add(c);
         } else {
           Carta c = Carta(valor, i + 1, naipe);

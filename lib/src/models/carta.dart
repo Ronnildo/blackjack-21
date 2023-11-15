@@ -1,5 +1,5 @@
-import 'package:blackjack/src/model/naipe.dart';
-import 'package:blackjack/src/model/valor.dart';
+import 'package:blackjack/src/models/naipe.dart';
+import 'package:blackjack/src/models/valor.dart';
 
 class Carta {
   Valor _valor;

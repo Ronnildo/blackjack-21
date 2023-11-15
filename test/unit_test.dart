@@ -1,7 +1,8 @@
-import 'package:blackjack/src/model/baralho.dart';
-import 'package:blackjack/src/model/carta.dart';
-import 'package:blackjack/src/model/naipe.dart';
-import 'package:blackjack/src/model/valor.dart';
+import 'package:blackjack/src/models/baralho.dart';
+import 'package:blackjack/src/models/carta.dart';
+import 'package:blackjack/src/models/naipe.dart';
+import 'package:blackjack/src/models/valor.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
