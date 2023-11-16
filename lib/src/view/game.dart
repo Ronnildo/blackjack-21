@@ -11,10 +11,12 @@ import 'package:flutter/material.dart';
 
 // Utilizando Observer
 class GameScreen extends StatefulWidget {
-  final Partida partida;
+  final String jogadorUm;
+  final String jogadorDois;
   const GameScreen({
     Key? key,
-    required this.partida,
+    required this.jogadorUm,
+    required this.jogadorDois,
   }) : super(key: key);
 
   @override
@@ -22,16 +24,20 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> implements Observer {
+  Partida p = Partida();
   @override
   void initState() {
-    widget.partida.iniciarPartida();
-    widget.partida.addObserver(this);
+    Jogador playerOne = Jogador(widget.jogadorUm);
+    Jogador playerTwo = Jogador(widget.jogadorDois);
+    p.iniciarPartida(playerOne, playerTwo);
+    p.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    widget.partida.removeObserver(this);
+    p.removeObserver(this);
+    p.limparMaos();
     super.dispose();
   }
 
@@ -72,7 +78,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
   }
 
   List<Carta> lista(int index) {
-    return widget.partida.jogadores[index].mostrarCartas();
+    return p.jogadores[index].mostrarCartas();
   }
 
   @override
@@ -100,7 +106,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Pontuação de ${widget.partida.jogadores[0].nome}: ${widget.partida.retornaPontuacao(widget.partida.jogadores[0])}",
+              "Pontuação de ${p.jogadores[0].nome}: ${p.retornaPontuacao(p.jogadores[0])}",
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -125,7 +131,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
               height: 50,
             ),
             Text(
-              "Pontuação de ${widget.partida.jogadores[1].nome}: ${widget.partida.retornaPontuacao(widget.partida.jogadores[1])}",
+              "Pontuação de ${p.jogadores[1].nome}: ${p.retornaPontuacao(p.jogadores[1])}",
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -154,44 +160,34 @@ class _GameScreenState extends State<GameScreen> implements Observer {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    if (!widget.partida.jogadores[0].jogadaTerminada) {
+                    if (!p.jogadores[0].jogadaTerminada) {
                       setState(() {
-                        widget.partida
-                            .jogadorDaVez(widget.partida.jogadores[0]);
-                        if (widget.partida.jogadores[0].jogadaTerminada) {
-                          if (widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[0]) ==
-                              21) {
+                        p.jogadorDaVez(p.jogadores[0]);
+                        if (p.jogadores[0].jogadaTerminada) {
+                          if (p.retornaPontuacao(p.jogadores[0]) == 21) {
                             dialog("Você venceu!!",
-                                "Atingiu os ${widget.partida.jogadores[0]} pontos");
-                          } else if (widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[0]) >
-                              21) {
+                                "Atingiu os ${p.jogadores[0]} pontos");
+                          } else if (p.retornaPontuacao(p.jogadores[0]) > 21) {
                             dialog(
-                                "Você Perdeu!!",
-                                "Atingiu ${widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[0],
+                                "Sua Pontuação",
+                                "Atingiu ${p.retornaPontuacao(
+                                  p.jogadores[0],
                                 )} Pontos");
                           }
                         }
                       });
                     } else {
                       setState(() {
-                        widget.partida
-                            .jogadorDaVez(widget.partida.jogadores[1]);
-                        if (widget.partida.jogadores[1].jogadaTerminada) {
-                          if (widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[1]) ==
-                              21) {
+                        p.jogadorDaVez(p.jogadores[1]);
+                        if (p.jogadores[1].jogadaTerminada) {
+                          if (p.retornaPontuacao(p.jogadores[1]) == 21) {
                             dialog("Você venceu!!",
-                                "Atingiu os ${widget.partida.retornaPontuacao(widget.partida.jogadores[1])} pontos");
-                          } else if (widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[1]) >
-                              21) {
+                                "Atingiu os ${p.retornaPontuacao(p.jogadores[1])} pontos");
+                          } else if (p.retornaPontuacao(p.jogadores[1]) > 21) {
                             dialog(
-                                "Você Perdeu!!",
-                                "Atingiu ${widget.partida.retornaPontuacao(
-                                  widget.partida.jogadores[1],
+                                "Sua Pontuação",
+                                "Atingiu ${p.retornaPontuacao(
+                                  p.jogadores[1],
                                 )} Pontos");
                           }
                         }
@@ -215,22 +211,38 @@ class _GameScreenState extends State<GameScreen> implements Observer {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    for (Jogador j in widget.partida.jogadores) {
-                      if (j.jogadaTerminada) {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: Text(
-                                  "Vez do Jogador ${widget.partida.jogadores[1].nome}",
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    if (!p.jogadores[0].jogadaTerminada) {
+                      p.jogadores[0].jogadaTerminada = true;
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: Text(
+                              "Vez do Jogador ${p.jogadores[1].nome}",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    } else if (!p.jogadores[1].jogadaTerminada) {
+                      p.jogadores[1].jogadaTerminada = true;
+                      p.jogadores[0].jogadaTerminada = false;
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Text(
+                                "Vez do Jogador ${p.jogadores[0].nome}",
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              );
-                            });
-                      }
+                              ),
+                            );
+                          });
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -259,7 +271,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
   @override
   void notifyChange(Carta carta) {
     setState(() {
-      for (Jogador j in widget.partida.jogadores) {
+      for (Jogador j in p.jogadores) {
         if (!j.jogadaTerminada) {
           j.pegarCarta(carta);
         }

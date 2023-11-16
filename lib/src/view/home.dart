@@ -14,21 +14,17 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _jogadorUmController =
-      TextEditingController(text: "Pedro");
+      TextEditingController(text: "");
   final TextEditingController _jogadorDoisController =
-      TextEditingController(text: "Lucas");
+      TextEditingController(text: "");
 
   iniciarPartida() {
-    Partida p = Partida();
-    Jogador playerOne = Jogador(_jogadorUmController.text);
-    p.adiconarJogadores(playerOne);
-    Jogador playerTwo = Jogador(_jogadorDoisController.text);
-    p.adiconarJogadores(playerTwo);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: ((context) => GameScreen(
-              partida: p,
+              jogadorUm: _jogadorUmController.text,
+              jogadorDois: _jogadorDoisController.text,
             )),
       ),
     );

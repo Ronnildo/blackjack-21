@@ -16,8 +16,10 @@ class Partida implements Observable {
   final List<Jogador> _jogadores = [];
   int top = 0;
 
-  void iniciarPartida() {
+  void iniciarPartida(Jogador j1, Jogador j2) {
     baralho = Baralho.baralho;
+    adiconarJogadores(j1);
+    adiconarJogadores(j2);
     limparMaos();
     distribuirCartas();
   }
