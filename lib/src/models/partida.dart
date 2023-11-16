@@ -28,7 +28,11 @@ class Partida implements Observable {
   }
 
   int retornaPontuacao(Jogador j) {
-    return j.somaDePontos();
+    int soma = 0;
+    for (Carta c in j.minhasCartas) {
+      soma += c.numero;
+    }
+    return soma;
   }
 
   void limparMaos() {
@@ -72,21 +76,16 @@ class Partida implements Observable {
     return false;
   }
 
-  void jogadorDaVez() {
-    for (Jogador j in _jogadores) {
-      while (!j.jogadaTerminada) {
-        print(retornaPontuacao(j));
-        if (retornaPontuacao(j) < 21) {
-          pegarCarta(j);
-          retornaPontuacao(j);
-        } else if (retornaPontuacao(j) == 21) {
-          j.jogadaTerminada = true;
-        } else if (retornaPontuacao(j) > 21) {
-          j.jogadaTerminada = true;
-        }
-      }
-      j.mostrarCartas();
+  void jogadorDaVez(Jogador j) {
+    if (!j.jogadaTerminada) {
+      pegarCarta(j);
     }
+    if (retornaPontuacao(j) == 21) {
+      j.jogadaTerminada = true;
+    } else if (retornaPontuacao(j) > 21) {
+      j.jogadaTerminada = true;
+    }
+    j.mostrarCartas();
   }
 
   List<Jogador> get jogadores => _jogadores;

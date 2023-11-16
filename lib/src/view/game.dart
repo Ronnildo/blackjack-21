@@ -35,12 +35,12 @@ class _GameScreenState extends State<GameScreen> implements Observer {
     super.dispose();
   }
 
-  dialog(String text) {
+  dialog(String title, String text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Fim da Partida"),
+          title: Text(title),
           content: Text(text),
           alignment: Alignment.center,
           actions: [
@@ -149,25 +149,107 @@ class _GameScreenState extends State<GameScreen> implements Observer {
             const SizedBox(
               height: 50,
             ),
-            ElevatedButton(
-              onPressed: () {
-                widget.partida.jogadorDaVez();
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.purple.shade800,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 20,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (!widget.partida.jogadores[0].jogadaTerminada) {
+                      setState(() {
+                        widget.partida
+                            .jogadorDaVez(widget.partida.jogadores[0]);
+                        if (widget.partida.jogadores[0].jogadaTerminada) {
+                          if (widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[0]) ==
+                              21) {
+                            dialog("Você venceu!!",
+                                "Atingiu os ${widget.partida.jogadores[0]} pontos");
+                          } else if (widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[0]) >
+                              21) {
+                            dialog(
+                                "Você Perdeu!!",
+                                "Atingiu ${widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[0],
+                                )} Pontos");
+                          }
+                        }
+                      });
+                    } else {
+                      setState(() {
+                        widget.partida
+                            .jogadorDaVez(widget.partida.jogadores[1]);
+                        if (widget.partida.jogadores[1].jogadaTerminada) {
+                          if (widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[1]) ==
+                              21) {
+                            dialog("Você venceu!!",
+                                "Atingiu os ${widget.partida.retornaPontuacao(widget.partida.jogadores[1])} pontos");
+                          } else if (widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[1]) >
+                              21) {
+                            dialog(
+                                "Você Perdeu!!",
+                                "Atingiu ${widget.partida.retornaPontuacao(
+                                  widget.partida.jogadores[1],
+                                )} Pontos");
+                          }
+                        }
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.purple.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
+                  ),
+                  child: const Text(
+                    "Pegar Carta",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-              child: const Text(
-                "Pegar Carta",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
+                ElevatedButton(
+                  onPressed: () {
+                    for (Jogador j in widget.partida.jogadores) {
+                      if (j.jogadaTerminada) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Text(
+                                  "Vez do Jogador ${widget.partida.jogadores[1].nome}",
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            });
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.purple.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
+                  ),
+                  child: const Text(
+                    "Passar a Vez",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ],
         ),
       ),
