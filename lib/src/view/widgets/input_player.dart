@@ -19,10 +19,17 @@ class _InputPlayerState extends State<InputPlayer> {
         bottom: 16,
       ),
       child: TextField(
+        keyboardType: TextInputType.text,
+        autofocus: true,
         controller: widget.controller,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
         decoration: InputDecoration(
           hintStyle: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             color: Colors.white,
           ),
           enabledBorder: OutlineInputBorder(
@@ -46,7 +53,8 @@ class _InputPlayerState extends State<InputPlayer> {
             color: Colors.white,
           ),
           fillColor: Colors.white,
-          hintText: widget.text,
+          hintText: "Ex: ${widget.text}",
+          hoverColor: Colors.white,
         ),
       ),
     );

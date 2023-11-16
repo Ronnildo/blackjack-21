@@ -1,37 +1,110 @@
-import 'package:blackjack/src/models/baralho.dart';
+import 'package:blackjack/src/exceptions/excessao_numero_de_jogadores_invalido.dart';
+import 'package:blackjack/src/models/baralho_singleton.dart';
+import 'package:blackjack/src/models/carta.dart';
 import 'package:blackjack/src/models/jogador.dart';
+import 'package:blackjack/src/models/observer.dart';
 
-class Partida {
-  Baralho? _baralho;
-  List<Jogador> jogadores = [];
-  late int _primeiraCarta; //Carta do topo
+abstract class Observable {
+  void addObserver(Observer observer);
+  void removeObserver(Observer observer);
+  void notifyChange(Carta carta);
+}
 
-  baralhoIniciar() {
-    _baralho;
+class Partida implements Observable {
+  var baralho;
+  final List<Observer> _listObserverCarta = [];
+  final List<Jogador> _jogadores = [];
+  int top = 0;
+
+  void iniciarPartida() {
+    baralho = Baralho.baralho;
+    limparMaos();
+    distribuirCartas();
   }
 
-  adiconarJogadores(String p, Jogador j) {
-    jogadores.add(j);
+  void pegarCarta(Jogador j) {
+    j.pegarCarta(baralho.retornaTopo(top));
+    top++;
   }
 
-  pegarCartaDoBaralho(Jogador j) {
-    j.pegarCarta(_baralho!.retornaTopo(_primeiraCarta));
-    j.somaDePontos();
-    _primeiraCarta++;
+  int retornaPontuacao(Jogador j) {
+    return j.somaDePontos();
   }
 
-  iniciarPartida() {
-    if (jogadores.length == 2) {
-      iniciarPartida();
-      _primeiraCarta = 0;
-      limpaMao();
+  void limparMaos() {
+    for (Jogador j in _jogadores) {
+      j.jogadorSemCartas();
+      j.jogadaTerminada = false;
     }
   }
 
-  limpaMao() {
-    for (Jogador j in jogadores) {
-      j.maosLimpas;
-      j.jogadaTerminada = false;
+  void adiconarJogadores(Jogador playerOne) {
+    try {
+      if (_jogadores.length < 2) {
+        _jogadores.add(playerOne);
+      }
+    } catch (err) {
+      throw ExcessaoNumeroDeJogadoresInvalidos("Número de Jogadores Inválidos");
+    }
+  }
+
+  void distribuirCartas() {
+    for (int i = 0; i <= 1; i++) {
+      for (Jogador j in _jogadores) {
+        pegarCarta(j);
+      }
+    }
+  }
+
+  partidaEncerrada() {
+    for (Jogador j in _jogadores) {
+      if (j.jogadaTerminada) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool vencedor() {
+    if (partidaEncerrada()) {
+      return true;
+    }
+    return false;
+  }
+
+  void jogadorDaVez() {
+    for (Jogador j in _jogadores) {
+      while (!j.jogadaTerminada) {
+        print(retornaPontuacao(j));
+        if (retornaPontuacao(j) < 21) {
+          pegarCarta(j);
+          retornaPontuacao(j);
+        } else if (retornaPontuacao(j) == 21) {
+          j.jogadaTerminada = true;
+        } else if (retornaPontuacao(j) > 21) {
+          j.jogadaTerminada = true;
+        }
+      }
+      j.mostrarCartas();
+    }
+  }
+
+  List<Jogador> get jogadores => _jogadores;
+
+  @override
+  void addObserver(Observer observer) {
+    _listObserverCarta.add(observer);
+  }
+
+  @override
+  void removeObserver(Observer observer) {
+    _listObserverCarta.remove(observer);
+  }
+
+  @override
+  void notifyChange(Carta carta) {
+    for (var observer in _listObserverCarta) {
+      observer.notifyChange(carta);
     }
   }
 }

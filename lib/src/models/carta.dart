@@ -35,8 +35,8 @@ class Carta {
         valor.name == "J" ||
         valor.name == "Q" ||
         valor.name == "K") {
-      return "${valor.name.toUpperCase()}${naipe.name} = $numero de ${literalNaipe(naipe)}";
+      return "${valor.name.toUpperCase()}${naipe.name}";
     }
-    return "$numero${naipe.name} = $numero de ${literalNaipe(naipe)}";
+    return "$numero${naipe.name}";
   }
 }

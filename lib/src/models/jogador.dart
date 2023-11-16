@@ -3,7 +3,7 @@ import 'package:blackjack/src/models/carta.dart';
 class Jogador {
   String? _nome;
   List<Carta> _minhasCartas = [];
-  bool? _jogadaTerminada;
+  bool _jogadaTerminada = false;
   int _pontosJogador = 0;
 
   Jogador(this._nome) {
@@ -16,14 +16,14 @@ class Jogador {
   int get pontosJogador => _pontosJogador;
   set pontosJogador(int value) => _pontosJogador = value;
 
-  bool get jogadaTerminada => _jogadaTerminada!;
+  bool get jogadaTerminada => _jogadaTerminada;
   set jogadaTerminada(bool value) => _jogadaTerminada = value;
 
-  List<Carta> get maosLimpas => _minhasCartas;
+  List<Carta> get minhasCartas => _minhasCartas;
 
   jogadorSemCartas() {
-    if (_minhasCartas.isEmpty) {
-      return true;
+    if (_minhasCartas.isNotEmpty) {
+      _minhasCartas.clear();
     }
   }
 
@@ -32,20 +32,18 @@ class Jogador {
   }
 
   mostrarCartas() {
-    for (Carta c in _minhasCartas) {
-      print(c.toString());
-    }
+    return _minhasCartas;
   }
 
-  somaDePontos() {
+  int somaDePontos() {
     for (Carta c in _minhasCartas) {
       _pontosJogador += c.numero;
     }
-    return pontosJogador;
+    return _pontosJogador;
   }
 
   @override
   String toString() {
-    return "Nome: $nome, Pontuação: $pontosJogador";
+    return "$nome + $pontosJogador";
   }
 }

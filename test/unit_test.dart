@@ -1,4 +1,4 @@
-import 'package:blackjack/src/models/baralho.dart';
+import 'package:blackjack/src/models/baralho_singleton.dart';
 import 'package:blackjack/src/models/carta.dart';
 import 'package:blackjack/src/models/naipe.dart';
 import 'package:blackjack/src/models/valor.dart';

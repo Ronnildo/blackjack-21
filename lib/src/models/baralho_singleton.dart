@@ -12,7 +12,7 @@ class Baralho {
   Baralho._() {
     criarBaralho();
     embaralhar();
-    printBaralho();
+    // printBaralho();
   }
   static final baralho = Baralho._();
 
@@ -24,7 +24,7 @@ class Baralho {
       Naipe naipe = naipes[n];
       for (var i = 0; i < 13; i++) {
         Valor valor = valores[i];
-        if (i > 10) {
+        if (i > 9) {
           Carta c = Carta(valor, 10, naipe);
           cartaList.add(c);
         } else {
@@ -33,7 +33,7 @@ class Baralho {
         }
       }
     }
-    // print(cartaList);
+    // print(cartaList[0].numero);
   }
 
   int contemNaLista(int val) {
@@ -47,9 +47,8 @@ class Baralho {
   }
 
   embaralhar() {
-    var sort;
     for (int i = 0; i < qtdCartas; i++) {
-      sort = Random().nextInt(52);
+      var sort = Random().nextInt(52);
       cartasEmbaralhadas.add(contemNaLista(sort));
     }
   }

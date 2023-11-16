@@ -1,4 +1,4 @@
-class BlackJackExceptions implements Exception {
+abstract class BlackJackExceptions implements Exception {
   final String msg;
   BlackJackExceptions(this.msg);
   @override
