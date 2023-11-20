@@ -44,6 +44,6 @@ class Jogador {
 
   @override
   String toString() {
-    return "$nome + $pontosJogador";
+    return nome;
   }
 }

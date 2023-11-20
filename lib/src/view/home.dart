@@ -1,7 +1,9 @@
+import 'package:blackjack/src/models/historico.dart';
 import 'package:blackjack/src/models/jogador.dart';
 import 'package:blackjack/src/models/partida.dart';
 
 import 'package:blackjack/src/view/game.dart';
+import 'package:blackjack/src/view/resultados.dart';
 import 'package:blackjack/src/view/widgets/input_player.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Historico h = Historico();
   final TextEditingController _jogadorUmController =
       TextEditingController(text: "");
   final TextEditingController _jogadorDoisController =
@@ -25,7 +28,17 @@ class _HomeState extends State<Home> {
         builder: ((context) => GameScreen(
               jogadorUm: _jogadorUmController.text,
               jogadorDois: _jogadorDoisController.text,
+              resultados: h,
             )),
+      ),
+    );
+  }
+
+  historico() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: ((context) => Resultados(historico: h)),
       ),
     );
   }
@@ -94,23 +107,42 @@ class _HomeState extends State<Home> {
                   controller: _jogadorDoisController,
                   text: "Jogador2",
                 ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: iniciarPartida,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.purple.shade800,
-                      textStyle: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: iniciarPartida,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.purple.shade800,
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                      padding: const EdgeInsets.all(20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      child: const Text("Start Game"),
                     ),
-                    child: const Text("Start Game"),
-                  ),
+                    ElevatedButton(
+                      onPressed: historico,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.purple.shade800,
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text("Histórico"),
+                    ),
+                  ],
                 )
               ],
             ),

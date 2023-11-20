@@ -1,4 +1,5 @@
 import 'package:blackjack/src/models/carta.dart';
+import 'package:blackjack/src/models/historico.dart';
 import 'package:blackjack/src/models/jogador.dart';
 import 'package:blackjack/src/models/naipe.dart';
 import 'package:blackjack/src/models/observer.dart';
@@ -13,10 +14,12 @@ import 'package:flutter/material.dart';
 class GameScreen extends StatefulWidget {
   final String jogadorUm;
   final String jogadorDois;
+  final Historico resultados;
   const GameScreen({
     Key? key,
     required this.jogadorUm,
     required this.jogadorDois,
+    required this.resultados,
   }) : super(key: key);
 
   @override
@@ -25,6 +28,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> implements Observer {
   Partida p = Partida();
+
   @override
   void initState() {
     Jogador playerOne = Jogador(widget.jogadorUm);
@@ -38,10 +42,12 @@ class _GameScreenState extends State<GameScreen> implements Observer {
   void dispose() {
     p.removeObserver(this);
     p.limparMaos();
+    p.jogadores.clear();
+
     super.dispose();
   }
 
-  dialog(String title, String text) {
+  dialog(String title, String text, int pontuacao) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -55,7 +61,15 @@ class _GameScreenState extends State<GameScreen> implements Observer {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    if (pontuacao == 21) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Home(),
+                          ));
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: const Text('Voltar'),
                 ),
@@ -64,10 +78,10 @@ class _GameScreenState extends State<GameScreen> implements Observer {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Home(),
+                          builder: (context) => const Home(),
                         ));
                   },
-                  child: Text('Iniciar Nova Partida'),
+                  child: const Text('Iniciar Nova Partida'),
                 ),
               ],
             ),
@@ -79,6 +93,104 @@ class _GameScreenState extends State<GameScreen> implements Observer {
 
   List<Carta> lista(int index) {
     return p.jogadores[index].mostrarCartas();
+  }
+
+  void pegaCarta() {
+    if (!p.jogadores[0].jogadaTerminada) {
+      setState(() {
+        p.jogadorDaVez(p.jogadores[0]);
+        if (p.jogadores[0].jogadaTerminada) {
+          if (p.retornaPontuacao(p.jogadores[0]) == 21) {
+            dialog(
+                "Você venceu!!",
+                "Atingiu os ${p.retornaPontuacao(p.jogadores[0])} pontos",
+                p.retornaPontuacao(p.jogadores[0]));
+            widget.resultados.addPartidaHistorico(data(
+                p,
+                p.jogadores[0],
+                p.jogadores[1],
+                p.retornaPontuacao(p.jogadores[0]),
+                p.retornaPontuacao(p.jogadores[1]),
+                p.retornaResultado(p.jogadores[0], p.jogadores[1])));
+            // Navigator.pop(context);
+          } else if (p.retornaPontuacao(p.jogadores[0]) > 21) {
+            p.jogadores[0].jogadaTerminada = true;
+            dialog(
+                "Sua Pontuação",
+                "Atingiu ${p.retornaPontuacao(
+                  p.jogadores[0],
+                )} Pontos",
+                p.retornaPontuacao(p.jogadores[0]));
+          } else {
+            p.jogadores[1].jogadaTerminada = false;
+          }
+        }
+      });
+    } else {
+      setState(() {
+        p.jogadorDaVez(p.jogadores[1]);
+        if (p.jogadores[1].jogadaTerminada) {
+          if (p.retornaPontuacao(p.jogadores[1]) == 21) {
+            dialog(
+                "Você venceu!!",
+                "Atingiu os ${p.retornaPontuacao(p.jogadores[1])} pontos",
+                p.retornaPontuacao(p.jogadores[1]));
+            widget.resultados.addPartidaHistorico(data(
+                p,
+                p.jogadores[0],
+                p.jogadores[1],
+                p.retornaPontuacao(p.jogadores[0]),
+                p.retornaPontuacao(p.jogadores[1]),
+                p.retornaResultado(p.jogadores[0], p.jogadores[1])));
+          } else if (p.retornaPontuacao(p.jogadores[1]) > 21) {
+            p.jogadores[1].jogadaTerminada = true;
+            p.jogadores[0].jogadaTerminada = false;
+            dialog(
+                "Sua Pontuação",
+                "Atingiu ${p.retornaPontuacao(
+                  p.jogadores[1],
+                )} Pontos",
+                p.retornaPontuacao(p.jogadores[1]));
+          } else {
+            p.jogadores[0].jogadaTerminada = false;
+          }
+        }
+      });
+    }
+
+    if (p.retornaPontuacao(p.jogadores[0]) > 21 &&
+        p.retornaPontuacao(p.jogadores[1]) > 21) {
+      setState(() {
+        widget.resultados.addPartidaHistorico(data(
+            p,
+            p.jogadores[0],
+            p.jogadores[1],
+            p.retornaPontuacao(p.jogadores[0]),
+            p.retornaPontuacao(p.jogadores[1]),
+            p.retornaResultado(p.jogadores[0], p.jogadores[1])));
+      });
+      print(widget.resultados.resultados);
+      dialog(
+          "Empate",
+          "${p.jogadores[0].nome}: ${p.retornaPontuacao(
+            p.jogadores[0],
+          )} Pontos\n${p.jogadores[1].nome}: ${p.retornaPontuacao(
+            p.jogadores[1],
+          )} Pontos",
+          p.retornaPontuacao(p.jogadores[0]));
+    }
+  }
+
+  Map<String, dynamic> data(
+      Partida p, Jogador j1, Jogador j2, int ptJ1, int ptJ2, String result) {
+    Map<String, dynamic> partida = {
+      "jogador1": j1.nome,
+      "jogador2": j2.nome,
+      "ptj1": ptJ1,
+      "ptj2": ptJ2,
+      "Resultado": p.retornaResultado(j1, j2),
+    };
+    return partida;
   }
 
   @override
@@ -159,41 +271,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    if (!p.jogadores[0].jogadaTerminada) {
-                      setState(() {
-                        p.jogadorDaVez(p.jogadores[0]);
-                        if (p.jogadores[0].jogadaTerminada) {
-                          if (p.retornaPontuacao(p.jogadores[0]) == 21) {
-                            dialog("Você venceu!!",
-                                "Atingiu os ${p.jogadores[0]} pontos");
-                          } else if (p.retornaPontuacao(p.jogadores[0]) > 21) {
-                            dialog(
-                                "Sua Pontuação",
-                                "Atingiu ${p.retornaPontuacao(
-                                  p.jogadores[0],
-                                )} Pontos");
-                          }
-                        }
-                      });
-                    } else {
-                      setState(() {
-                        p.jogadorDaVez(p.jogadores[1]);
-                        if (p.jogadores[1].jogadaTerminada) {
-                          if (p.retornaPontuacao(p.jogadores[1]) == 21) {
-                            dialog("Você venceu!!",
-                                "Atingiu os ${p.retornaPontuacao(p.jogadores[1])} pontos");
-                          } else if (p.retornaPontuacao(p.jogadores[1]) > 21) {
-                            dialog(
-                                "Sua Pontuação",
-                                "Atingiu ${p.retornaPontuacao(
-                                  p.jogadores[1],
-                                )} Pontos");
-                          }
-                        }
-                      });
-                    }
-                  },
+                  onPressed: pegaCarta,
                   style: ElevatedButton.styleFrom(
                     primary: Colors.purple.shade800,
                     padding: const EdgeInsets.symmetric(
@@ -213,6 +291,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
                   onPressed: () {
                     if (!p.jogadores[0].jogadaTerminada) {
                       p.jogadores[0].jogadaTerminada = true;
+                      p.jogadores[1].jogadaTerminada = false;
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -243,7 +322,7 @@ class _GameScreenState extends State<GameScreen> implements Observer {
                               ),
                             );
                           });
-                    }
+                    } else {}
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.purple.shade800,

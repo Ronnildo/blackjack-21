@@ -1,6 +1,7 @@
 import 'package:blackjack/src/exceptions/excessao_numero_de_jogadores_invalido.dart';
 import 'package:blackjack/src/models/baralho_singleton.dart';
 import 'package:blackjack/src/models/carta.dart';
+import 'package:blackjack/src/models/historico.dart';
 import 'package:blackjack/src/models/jogador.dart';
 import 'package:blackjack/src/models/observer.dart';
 
@@ -12,6 +13,7 @@ abstract class Observable {
 
 class Partida implements Observable {
   var baralho;
+  Historico historico = Historico();
   final List<Observer> _listObserverCarta = [];
   final List<Jogador> _jogadores = [];
   int top = 0;
@@ -107,5 +109,16 @@ class Partida implements Observable {
     for (var observer in _listObserverCarta) {
       observer.notifyChange(carta);
     }
+  }
+
+  String retornaResultado(Jogador j1, Jogador j2) {
+    if (retornaPontuacao(j1) == 21 && retornaPontuacao(j2) > 21) {
+      return "${j1.toString()} Venceu!!";
+    } else if (retornaPontuacao(j2) == 21 && retornaPontuacao(j1) > 21) {
+      return "${j2.toString()} Venceu!!";
+    } else if (retornaPontuacao(j2) > 21 && retornaPontuacao(j1) > 21) {
+      return "Empate";
+    }
+    return "";
   }
 }
